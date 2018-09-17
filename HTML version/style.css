@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css?family=Press+Start+2P');
+
+#background {
+    background-image: url('assets/background.jpg');
+    height: 700px;
+    width: 1000px;
+    position: relative;
+}
+
+#play {
+    font-family: 'Press Start 2P', sans-serif;
+    font-size: 15px;
+    color: white;
+    background: transparent;
+    border: hidden;
+}
+
+#play:hover {
+    color: rgba(255, 0, 0, 0.822); 
+}
+
+#ship {
+    background-image: url('assets/ship.png');
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    top: 640px;
+    left: 475px;
+}
+
+.alien {
+    background-image: url('assets/alien.png');
+    height: 35px;
+    width: 50px;
+    position: absolute;
+}
+
+#aliens {
+    height: 650px;
+    width: 950px;
+    position: absolute;
+}
+
+#bullets {
+    height: 650px;
+    width: 950px;
+    position: absolute;
+}
+
+.bullet {
+    background-image: url('assets/bullet.png');
+    height: 10px;
+    width: 10px;
+    position: absolute;
+}

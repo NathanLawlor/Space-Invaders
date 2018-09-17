@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Space Invaders</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id='background'>
+        <button id='play' class='playButton'>Start Game</button>
+        <div id='ship'></div>
+        <!-- <div class='alien'></div> -->
+        <div id='bullets'></div>
+        <div id='aliens'></div>
+    </div>
+    <script>
+        let shipIcon = document.getElementById('ship');
+        let ship = {
+            top: 640,
+            left: 475
+        };
+
+        let alienArea = {
+            left: 380,
+            right: 380
+        }
+
+        let bullets = [];
+        let aliens = [
+            {left: 100, top: 100}, //line 1
+            {left: 160, top: 100},
+            {left: 220, top: 100},
+            {left: 280, top: 100},
+            {left: 340, top: 100},
+            {left: 400, top: 100},
+            {left: 460, top: 100},
+            {left: 520, top: 100},
+            {left: 580, top: 100},
+            {left: 640, top: 100},
+            {left: 700, top: 100},
+            {left: 760, top: 100},
+            {left: 100, top: 150}, //line 2
+            {left: 160, top: 150},
+            {left: 220, top: 150},
+            {left: 280, top: 150},
+            {left: 340, top: 150},
+            {left: 400, top: 150},
+            {left: 460, top: 150},
+            {left: 520, top: 150},
+            {left: 580, top: 150},
+            {left: 640, top: 150},
+            {left: 700, top: 150},
+            {left: 760, top: 150},
+            {left: 100, top: 200}, //line 3
+            {left: 160, top: 200},
+            {left: 220, top: 200},
+            {left: 280, top: 200},
+            {left: 340, top: 200},
+            {left: 400, top: 200},
+            {left: 460, top: 200},
+            {left: 520, top: 200},
+            {left: 580, top: 200},
+            {left: 640, top: 200},
+            {left: 700, top: 200},
+            {left: 760, top: 200},
+            {left: 100, top: 250}, //line 4
+            {left: 160, top: 250},
+            {left: 220, top: 250},
+            {left: 280, top: 250},
+            {left: 340, top: 250},
+            {left: 400, top: 250},
+            {left: 460, top: 250},
+            {left: 520, top: 250},
+            {left: 580, top: 250},
+            {left: 640, top: 250},
+            {left: 700, top: 250},
+            {left: 760, top: 250},
+            {left: 100, top: 300}, //line 5
+            {left: 160, top: 300},
+            {left: 220, top: 300},
+            {left: 280, top: 300},
+            {left: 340, top: 300},
+            {left: 400, top: 300},
+            {left: 460, top: 300},
+            {left: 520, top: 300},
+            {left: 580, top: 300},
+            {left: 640, top: 300},
+            {left: 700, top: 300},
+            {left: 760, top: 300},
+        ];
+        let end = false;
+
+        document.onkeydown = function (e) {
+            if (e.keyCode == 37) {
+                if (ship.left > 60) {
+                    ship.left = ship.left - 20;
+                }
+                moveShip();
+            } 
+            else if (e.keyCode == 39) {
+                if (ship.left < 900) {
+                    ship.left = ship.left + 20;
+                }
+                moveShip();
+            }
+            else if (e.keyCode == 32) {
+                if (bullets.length == 0) {
+                bullets.push({left: ship.left + 20, top: ship.top - 30}) 
+                }
+                makeBullets();
+            }
+        };
+
+        function moveShip() {
+            document.getElementById('ship').style.left = ship.left + 'px';
+        }
+
+        function makeBullets() {
+            document.getElementById('bullets').innerHTML = '';
+            for (let bullet = 0; bullet < bullets.length; bullet = bullet + 1) {
+                document.getElementById('bullets').innerHTML +=
+                    `<div class='bullet' style='left: ${bullets[bullet].left}px; 
+                        top: ${bullets[bullet].top}px;'></div>` 
+            }
+        }
+
+        function moveBullets() {
+            for (let bullet = 0; bullet < bullets.length; bullet = bullet + 1) {
+                if (bullets[bullet].top > 5) {
+                bullets[bullet].top = bullets[bullet].top - 15;
+                }
+                else {
+                    bullets.splice(bullet, 1);
+                }
+            }
+        }
+
+        function setAlienArea() {
+            alienArea.left = 380;
+            alienArea.right = 380;
+            for (let alien = 0; alien < aliens.length; alien = alien + 1) {
+                if (aliens[alien].left <= alienArea.left) {
+                    alienArea.left = aliens[alien].left;
+                }
+                if (aliens[alien].left >= alienArea.right) {
+                    alienArea.right = aliens[alien].left;
+                }
+            }
+        }
+
+        function makeAliens() {
+            document.getElementById('aliens').innerHTML = '';
+            for (let alien = 0; alien < aliens.length; alien = alien + 1) {
+                document.getElementById('aliens').innerHTML +=
+                    `<div class='alien' style='left: ${aliens[alien].left}px; 
+                        top: ${aliens[alien].top}px;'></div>` 
+            }
+        }
+
+        function moveAliens() {
+            if (alienArea.right < 900 && end == false) {
+                for (let alien = 0; alien < aliens.length; alien = alien +1) {
+                    aliens[alien].left = aliens[alien].left + 1;
+                }
+                console.log(alienArea.right);
+                if (alienArea.right >= 899) {
+                    end = true;
+                    console.log("change direction to left");
+                    for (let alien = 0; alien < aliens.length; alien = alien +1) {
+                        aliens[alien].top = aliens[alien].top + 20;
+                    }
+                }
+            }
+
+            if (alienArea.left > 50 && end == true) {
+                for (let alien = 0; alien < aliens.length; alien = alien +1) {
+                    aliens[alien].left = aliens[alien].left - 1;
+                }
+                console.log(alienArea.left);
+                if (alienArea.left <= 51) {
+                    end = false;
+                    console.log("change direction to right");
+                    for (let alien = 0; alien < aliens.length; alien = alien +1) {
+                        aliens[alien].top = aliens[alien].top + 20;
+                    }
+                }
+            }
+            }
+            
+        function collisionDetection() {
+            for (let alien = 0; alien < aliens.length; alien = alien + 1) {
+                for (let bullet = 0; bullet < bullets.length; bullet = bullet + 1) {
+                    if (
+                        (bullets[bullet].top <= aliens[alien].top + 35) && 
+                        (bullets[bullet].top >= aliens[alien].top) &&
+                        (bullets[bullet].left >= aliens[alien].left) &&
+                        (bullets[bullet].left <= aliens[alien].left + 50)
+                        ){
+                            aliens.splice(alien,1);
+                            bullets.splice(bullet,1);
+                    }
+                }
+            }
+        }    
+
+        function gameloop() {
+            setTimeout(gameloop, 25);
+            moveBullets();
+            makeBullets();
+            setAlienArea();
+            moveAliens();
+            makeAliens();
+            collisionDetection();
+        }
+
+        let gameStart = false;
+        play.addEventListener('click', () => {
+            if (gameStart == false) {
+            gameloop();    
+            gameStart = true;
+            play.style.visibility = 'hidden';
+            shipIcon.style.visibility = 'visible';
+            }
+        })
+
+        shipIcon.style.visibility = 'hidden';
+
+    </script>
+    
+</body>
+</html>
