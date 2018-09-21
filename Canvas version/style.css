@@ -1,0 +1,28 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+.wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: whitesmoke;
+}
+
+.canvas {
+    width: 100%;
+    height: 100vh;
+    background-image: url("img/spaceBG.png")
+}
+
+.play {
+    width: 200px;
+    margin: 10px;
+    background-color: lightgreen;
+}
+.reset {
+    width: 200px;
+    margin: 10px;
+    background-color: lightcoral;
+}
