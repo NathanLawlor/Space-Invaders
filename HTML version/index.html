@@ -8,15 +8,50 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class='wrapper'>
 
-    <div id='background'>
-        <button id='play' class='playButton'>Start Game</button>
-        <div id='ship'></div>
-        <!-- <div class='alien'></div> -->
-        <div id='bullets'></div>
-        <div id='aliens'></div>
-    </div>
+    <div class='gameContainer'>
+        <div id='background'>
+            <div class="container">
+                <h1 id='title'>Space Invaders</h1>
+                <h2 id='gameOver'>Game Over</h2>
+                <button id='play' class='playButton'>Start Game</button>
+                <button id='reset' class='playButton'>Play Again</button>
+            </div>
+                <div id='barriers'></div>
+                <div id='ship'></div>
+                <!-- <div class='alien'></div> -->
+                <div id='bullets'></div>
+                <div id='aliens'></div>
+                <div id='bombs'></div>
+        </div>
+</div>
+
+</div>
+
     <script>
+        
+        let play = document.getElementById('play');
+        let reset = document.getElementById('reset');
+        let barriers = [
+            {left: 110, top: 595}, //1st row
+            {left: 330, top: 595},
+            {left: 550, top: 595},
+            {left: 770, top: 595},
+            {left: 110, top: 600}, //2nd row
+            {left: 330, top: 600},
+            {left: 550, top: 600},
+            {left: 770, top: 600},
+            {left: 110, top: 605}, //3rd row
+            {left: 330, top: 605},
+            {left: 550, top: 605},
+            {left: 770, top: 605},
+            {left: 110, top: 610}, //4th row
+            {left: 330, top: 610},
+            {left: 550, top: 610},
+            {left: 770, top: 610},
+        ];
+
         let shipIcon = document.getElementById('ship');
         let ship = {
             top: 640,
@@ -29,6 +64,7 @@
         }
 
         let bullets = [];
+        let bombs = [];
         let aliens = [
             {left: 100, top: 100}, //line 1
             {left: 160, top: 100},
@@ -96,26 +132,39 @@
         document.onkeydown = function (e) {
             if (e.keyCode == 37) {
                 if (ship.left > 60) {
-                    ship.left = ship.left - 20;
+                    ship.left = ship.left - 15;
                 }
-                moveShip();
+                makeShip();
             } 
             else if (e.keyCode == 39) {
                 if (ship.left < 900) {
-                    ship.left = ship.left + 20;
+                    ship.left = ship.left + 15;
                 }
-                moveShip();
+                makeShip();
             }
             else if (e.keyCode == 32) {
                 if (bullets.length == 0) {
-                bullets.push({left: ship.left + 20, top: ship.top - 30}) 
+                bullets.push({left: ship.left + 20, top: ship.top - 5}) 
                 }
                 makeBullets();
             }
         };
 
-        function moveShip() {
+        function makeShip() {
             document.getElementById('ship').style.left = ship.left + 'px';
+        }
+
+        function makeBarriers() {
+            document.getElementById('barriers').innerHTML = '';
+            for (let barrier = 0; barrier < barriers.length; barrier = barrier + 1) {
+                document.getElementById('barriers').innerHTML +=
+                    `<div class='barrier' style='
+                        left: ${barriers[barrier].left}px; 
+                        top: ${barriers[barrier].top}px; 
+                        width: ${barriers[barrier].width}px; 
+                        height: ${barriers[barrier].height}px;'>
+                    </div>` 
+            }
         }
 
         function makeBullets() {
@@ -130,7 +179,7 @@
         function moveBullets() {
             for (let bullet = 0; bullet < bullets.length; bullet = bullet + 1) {
                 if (bullets[bullet].top > 5) {
-                bullets[bullet].top = bullets[bullet].top - 15;
+                bullets[bullet].top = bullets[bullet].top - 10;
                 }
                 else {
                     bullets.splice(bullet, 1);
@@ -165,10 +214,8 @@
                 for (let alien = 0; alien < aliens.length; alien = alien +1) {
                     aliens[alien].left = aliens[alien].left + 1;
                 }
-                console.log(alienArea.right);
                 if (alienArea.right >= 899) {
                     end = true;
-                    console.log("change direction to left");
                     for (let alien = 0; alien < aliens.length; alien = alien +1) {
                         aliens[alien].top = aliens[alien].top + 20;
                     }
@@ -179,20 +226,55 @@
                 for (let alien = 0; alien < aliens.length; alien = alien +1) {
                     aliens[alien].left = aliens[alien].left - 1;
                 }
-                console.log(alienArea.left);
                 if (alienArea.left <= 51) {
                     end = false;
-                    console.log("change direction to right");
                     for (let alien = 0; alien < aliens.length; alien = alien +1) {
                         aliens[alien].top = aliens[alien].top + 20;
                     }
                 }
             }
             }
-            
+
+        function makeBomb() {
+            // console.log('make bomb');
+            document.getElementById('bombs').innerHTML = '';
+            for (let bomb = 0; bomb < bombs.length; bomb = bomb + 1) {
+                document.getElementById('bombs').innerHTML +=
+                    `<div class='bomb' style='left: ${bombs[bomb].left}px; 
+                        top: ${bombs[bomb].top}px;'></div>` 
+            }
+        }
+
+        function dropBomb() {
+            // console.log('drop bomb');
+            let randomAlien = Math.floor(Math.random() * aliens.length);
+                bombs.push({left: aliens[randomAlien].left + 20, top: aliens[randomAlien].top + 20});
+        }
+
+        function moveBomb() {
+            // console.log('move bomb');
+            for (let bomb = 0; bomb < bombs.length; bomb = bomb + 1) {
+                if (bombs[bomb].top < 700) {
+                bombs[bomb].top = bombs[bomb].top + 7;
+                }
+                else {
+                    bombs.splice(bomb, 1);
+                }
+            }
+        }
+        
+        let endGame = false;
+
         function collisionDetection() {
-            for (let alien = 0; alien < aliens.length; alien = alien + 1) {
-                for (let bullet = 0; bullet < bullets.length; bullet = bullet + 1) {
+            for (let alien = 0; alien < aliens.length; alien = alien + 1) { //aliens
+                if (
+                    (aliens[alien].left <= ship.left + 35) && 
+                    (aliens[alien].left >= ship.left - 90) && 
+                    (aliens[alien].top >= ship.top - 35) && 
+                    (aliens[alien].top <= ship.top + 90)) {
+                        endGame = true;
+                }
+                for (let bullet = 0; bullet < bullets.length; bullet = bullet + 1) { //aliens and bullets
                     if (
                         (bullets[bullet].top <= aliens[alien].top + 35) && 
                         (bullets[bullet].top >= aliens[alien].top) &&
@@ -203,30 +285,190 @@
                             bullets.splice(bullet,1);
                     }
                 }
+                
+            }
+            for (let bomb = 0; bomb < bombs.length; bomb = bomb +1) { //just bombs
+                if (
+                    (bombs[bomb].left <= ship.left + 50) && 
+                    (bombs[bomb].left >= ship.left - 5) && 
+                    (bombs[bomb].top >= ship.top - 5) && 
+                    (bombs[bomb].top <= ship.top + 5)) {
+                        endGame = true;
+                    }
+                for (barrier = 0; barrier < barriers.length; barrier = barrier + 1) { //bombs and barriers
+                    if (
+                    (bombs[bomb].left <= barriers[barrier].left + 120) && 
+                    (bombs[bomb].left >= barriers[barrier].left) && 
+                    (bombs[bomb].top >= barriers[barrier].top) && 
+                    (bombs[bomb].top <= barriers[barrier].top + 8)) {
+                        bombs.splice(bomb, 1);
+                        barriers.splice(barrier, 1);
+                    }
+            } 
+
+            if (endGame == true) {
+                document.getElementById('ship').style.display = 'none';
+                document.getElementById('aliens').style.display = 'none';
+                bombsDiv.style.display = 'none';
+                gameOver.style.display = 'block';
+                bulletsDiv.style.display = 'none';
+                barriersDiv.style.display = 'none';
+                reset.style.display = 'block';
             }
         }    
+    }
+
+        let gameOver = document.getElementById('gameOver');
+        let bulletsDiv = document.getElementById('bullets');
+        let aliensDiv = document.getElementById('aliens');
+        let bombsDiv = document.getElementById('bombs');
+        let barriersDiv = document.getElementById('barriers');
+
+        aliensDiv.style.display = 'none';
+        bulletsDiv.style.display = 'none';
+        bombsDiv.style.display = 'none';
 
         function gameloop() {
-            setTimeout(gameloop, 25);
+            if (endGame == false) {
+               setTimeout(gameloop, 25); 
+            }
             moveBullets();
             makeBullets();
             setAlienArea();
             moveAliens();
             makeAliens();
+            makeBomb();
+            moveBomb();
+            makeBarriers();
             collisionDetection();
+        }
+
+        function bombLoop() {
+            if (endGame == false) {
+                setTimeout(bombLoop, 1000); 
+            }
+            dropBomb();
         }
 
         let gameStart = false;
         play.addEventListener('click', () => {
             if (gameStart == false) {
-            gameloop();    
+            gameloop(); 
+            bombLoop()   
+            aliensDiv.style.display = 'block';
+            bulletsDiv.style.display = 'block';
+            bombsDiv.style.display = 'block';
             gameStart = true;
-            play.style.visibility = 'hidden';
+            play.style.display = 'none';
             shipIcon.style.visibility = 'visible';
+            document.getElementById('title').style.display = 'none';
             }
         })
+        
+        reset.addEventListener('click', () => {
+            console.log('reset');
+            end = false;
+            endGame = false;
+            gameStart = false;
+            aliens = [
+            {left: 100, top: 100}, //line 1
+            {left: 160, top: 100},
+            {left: 220, top: 100},
+            {left: 280, top: 100},
+            {left: 340, top: 100},
+            {left: 400, top: 100},
+            {left: 460, top: 100},
+            {left: 520, top: 100},
+            {left: 580, top: 100},
+            {left: 640, top: 100},
+            {left: 700, top: 100},
+            {left: 760, top: 100},
+            {left: 100, top: 150}, //line 2
+            {left: 160, top: 150},
+            {left: 220, top: 150},
+            {left: 280, top: 150},
+            {left: 340, top: 150},
+            {left: 400, top: 150},
+            {left: 460, top: 150},
+            {left: 520, top: 150},
+            {left: 580, top: 150},
+            {left: 640, top: 150},
+            {left: 700, top: 150},
+            {left: 760, top: 150},
+            {left: 100, top: 200}, //line 3
+            {left: 160, top: 200},
+            {left: 220, top: 200},
+            {left: 280, top: 200},
+            {left: 340, top: 200},
+            {left: 400, top: 200},
+            {left: 460, top: 200},
+            {left: 520, top: 200},
+            {left: 580, top: 200},
+            {left: 640, top: 200},
+            {left: 700, top: 200},
+            {left: 760, top: 200},
+            {left: 100, top: 250}, //line 4
+            {left: 160, top: 250},
+            {left: 220, top: 250},
+            {left: 280, top: 250},
+            {left: 340, top: 250},
+            {left: 400, top: 250},
+            {left: 460, top: 250},
+            {left: 520, top: 250},
+            {left: 580, top: 250},
+            {left: 640, top: 250},
+            {left: 700, top: 250},
+            {left: 760, top: 250},
+            {left: 100, top: 300}, //line 5
+            {left: 160, top: 300},
+            {left: 220, top: 300},
+            {left: 280, top: 300},
+            {left: 340, top: 300},
+            {left: 400, top: 300},
+            {left: 460, top: 300},
+            {left: 520, top: 300},
+            {left: 580, top: 300},
+            {left: 640, top: 300},
+            {left: 700, top: 300},
+            {left: 760, top: 300}];
+            barriers = [
+            {left: 110, top: 595}, //1st row
+            {left: 330, top: 595},
+            {left: 550, top: 595},
+            {left: 770, top: 595},
+            {left: 110, top: 600}, //2nd row
+            {left: 330, top: 600},
+            {left: 550, top: 600},
+            {left: 770, top: 600},
+            {left: 110, top: 605}, //3rd row
+            {left: 330, top: 605},
+            {left: 550, top: 605},
+            {left: 770, top: 605},
+            {left: 110, top: 610}, //4th row
+            {left: 330, top: 610},
+            {left: 550, top: 610},
+            {left: 770, top: 610},];
+            bullets = [];
+            bombs = [];
+            ship.left = 475;
+            gameOver.style.display = 'none';
+            reset.style.display = 'none';
+            aliensDiv.style.display = 'block';
+            bulletsDiv.style.display = 'block';
+            bombsDiv.style.display = 'block';
+            shipIcon.style.display = 'block';
+            barriersDiv.style.display = 'block';
+            makeAliens();
+            makeShip();
+            makeBarriers();
+            gameloop();
+            bombLoop();
+        });
+
 
         shipIcon.style.visibility = 'hidden';
+        gameOver.style.display = 'none';
+        reset.style.display = 'none';
 
     </script>
     
